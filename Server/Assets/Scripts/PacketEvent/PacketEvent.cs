@@ -24,14 +24,40 @@ namespace Assets.Scripts.PacketEvent
     }
     public enum EventDefine : byte
     {
+        Login,
         InstantiatePrefab,
-        TansformSync,
+
+
+        PlayerSyncTransform,
         MoveInput,
         LookInput,
         JumpInput,
         ThrowInput,
         SprintInput,
         ChargeInput,
+    }
+    public class Event_Login : Event_Packet
+    {
+        public EventDefine Event;
+        public Event_Login()
+            : base(EventDefine.Login)
+        {
+        }
+
+        public static void GetDecode(Memory<byte> bytes)
+        {
+
+        }
+        public override byte[] GetBytes()
+        {
+            int ProtocolSize = 1;
+
+            byte[] bytes = new byte[ProtocolSize];
+
+            int offset = 0;
+            bytes[offset] = (byte)EventDefine.Login;
+            return bytes;
+        }
     }
     public class Event_TansformSync : Event_Packet
     {
@@ -40,7 +66,7 @@ namespace Assets.Scripts.PacketEvent
         public UnityEngine.Quaternion Quaternion;
         public int ID;
         public Event_TansformSync(int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn)
-            : base(EventDefine.TansformSync)
+            : base(EventDefine.PlayerSyncTransform)
         {
             ID = id;
             Position = pos;
@@ -106,7 +132,7 @@ namespace Assets.Scripts.PacketEvent
                 QtnX_Length + QtnY_Length + QtnZ_Length + QtnW_Length];
 
             int offset = 0;
-            bytes[offset] = (byte)EventDefine.TansformSync;
+            bytes[offset] = (byte)EventDefine.PlayerSyncTransform;
             offset += ProtocolSize;
             BitConverter.GetBytes(ID).CopyTo(bytes.AsMemory(offset, NetID_Length));
             offset += NetID_Length;
@@ -260,8 +286,6 @@ namespace Assets.Scripts.PacketEvent
             return bytes;
         }
     }
-
-
     public class Event_JumpInput : Event_Packet
     {
         public int ID;
@@ -421,16 +445,18 @@ namespace Assets.Scripts.PacketEvent
         public UnityEngine.Quaternion Quaternion;
         public string Prefab;
         public int ID;
-        public Event_InstantiatePrefab(int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn, string prefabName)
+        public bool IsMine;
+        public Event_InstantiatePrefab(int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn, bool IsMine, string prefabName)
             : base(EventDefine.InstantiatePrefab)
         {
             ID = id;
             Position = pos;
             Quaternion = Qtn;
             Prefab = prefabName;
+            this.IsMine = IsMine;
         }
 
-        public static (int ID, UnityEngine.Vector3 pos, UnityEngine.Quaternion qtn, string prefabName) GetDecode(Memory<byte> bytes)
+        public static (int ID, UnityEngine.Vector3 pos, UnityEngine.Quaternion qtn, bool isMine, string prefabName) GetDecode(Memory<byte> bytes)
         {
             int ProtocolSize = 1;
             int offset = 0;
@@ -467,12 +493,22 @@ namespace Assets.Scripts.PacketEvent
             offset += QtnZ_Length;
             float qtnW = BitConverter.ToSingle(bytes.Slice(offset, QtnW_Length).Span);
             offset += QtnW_Length;
-
             UnityEngine.Quaternion quaternion = new UnityEngine.Quaternion(qtnX, qtnY, qtnZ, qtnW);
+
+
+            int IsMineLength = 1;
+            bool Mine = NetLibrary.Utils.Serializer.ToValue(bytes, offset, IsMineLength) != 0;
+
+            offset += IsMineLength;
             int remainingBytes = bytes.Length - offset;
+
             string prefabName = System.Text.Encoding.UTF8.GetString(bytes.Slice(offset, remainingBytes).Span);
+
+
+
+
             // 결과를 반환
-            return (id, position, quaternion, prefabName);
+            return (id, position, quaternion, Mine, prefabName);
         }
         public override byte[] GetBytes()
         {
@@ -488,9 +524,11 @@ namespace Assets.Scripts.PacketEvent
             int QtnZ_Length = 4;
             int QtnW_Length = 4;
 
+            int IsMineLength = 1;
+
             int Name_Length = Prefab.Length;
             byte[] bytes = new byte[ProtocolSize + NetID_Length + PosX_Length + PosY_Length + PosZ_Length +
-                QtnX_Length + QtnY_Length + QtnZ_Length + QtnW_Length + Name_Length];
+                QtnX_Length + QtnY_Length + QtnZ_Length + QtnW_Length + IsMineLength + Name_Length];
 
             int offset = 0;
             bytes[offset] = (byte)EventDefine.InstantiatePrefab;
@@ -513,6 +551,8 @@ namespace Assets.Scripts.PacketEvent
             offset += QtnZ_Length;
             BitConverter.GetBytes(Quaternion.w).CopyTo(bytes.AsMemory(offset, QtnW_Length));
             offset += QtnW_Length;
+            NetLibrary.Utils.Serializer.ToByte(IsMine ? 1 : 0, IsMineLength).CopyTo(bytes.AsMemory().Slice(offset, IsMineLength));
+            offset += IsMineLength;
             Encoding.UTF8.GetBytes(Prefab).CopyTo(bytes.AsMemory(offset, Name_Length));
             return bytes;
         }

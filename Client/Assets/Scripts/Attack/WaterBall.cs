@@ -11,7 +11,7 @@ namespace Attack
 
             if (ColliedObjectTag == "Floor")
                 Instantiate(pfWater, transform.position, pfWater.transform.rotation);
-            
+
             Destroy(this.gameObject);
         }
     }

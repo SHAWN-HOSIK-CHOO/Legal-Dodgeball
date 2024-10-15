@@ -1,13 +1,7 @@
+using Assets.Scripts.PacketEvent;
 using NetLibrary;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using UnityEditor.MemoryProfiler;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class NetworkManager : MonoBehaviour
@@ -18,13 +12,16 @@ public class NetworkManager : MonoBehaviour
     public int RemotePort = 8000;
     public string LocalIP = "192.168.0.38";
     public int LocalPort = 0;
-    
+
+
+    public EndUser EndUser;
+    public Dictionary<int, NetViewer> NetObjects = new Dictionary<int, NetViewer>();
 
     private static NetLibrary.Network netWork = null;
-    public ConcurrentQueue<EndUser> NewSyncUsers = new ConcurrentQueue<EndUser>();
 
     private async void Awake()
     {
+        // 비동기 함수의 생명주기에 주의할것
         if (instance != null)
         {
             Destroy(gameObject);
@@ -42,13 +39,17 @@ public class NetworkManager : MonoBehaviour
         bool Success = client.CreateEndUser(ServerAddress, SessionType.RUDP, out var user);
 
         bool MightBeSuccess = await user.SyncEndUser(1000);
-        if(!MightBeSuccess)
+        if (!MightBeSuccess)
         {
             Debug.Log("싱크 실패");
+            EndUser = null;
         }
         else
         {
-            NewSyncUsers.Enqueue(user);
+            Debug.Log($"New Sync{user.SyncID}");
+            EndUser = user;
+            var e = new Event_Login();
+            EndUser.DefferedSend(e.GetBytes());
         }
     }
 

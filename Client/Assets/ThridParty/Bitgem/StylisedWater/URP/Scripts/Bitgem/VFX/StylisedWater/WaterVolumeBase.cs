@@ -1,7 +1,6 @@
 ﻿#region Using statements
 
 using Bitgem.Core;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

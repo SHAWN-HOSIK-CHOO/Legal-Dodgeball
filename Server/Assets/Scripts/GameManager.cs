@@ -8,15 +8,14 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UIVirtualButton;
 
 public class GameManager : MonoBehaviour
 {
-    public List<GameObject> prefabEntries = new List<GameObject>();
-    Dictionary<string, GameObject> PrefabDicts = new Dictionary<string, GameObject>();
-    public static GameManager instance { get; private set; } = null;
+    public List<GameObject> prefabLists = new List<GameObject>();
+    private Dictionary<string, GameObject> prefabDicts = new Dictionary<string, GameObject>();
 
-    Dictionary<IPEndPoint, EndUser> Endusers = new Dictionary<IPEndPoint, EndUser>();
-    Dictionary<int, NetComponent> NetObjects = new Dictionary<int, NetComponent>();
+    public static GameManager instance { get; private set; } = null;
 
     private void Awake()
     {
@@ -32,16 +31,43 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        for (int i = 0; i < prefabEntries.Count; i++)
+        for (int i = 0; i < prefabLists.Count; i++)
         {
-            PrefabDicts.TryAdd(prefabEntries[i].name, prefabEntries[i]);
+            prefabDicts.TryAdd(prefabLists[i].name, prefabLists[i]);
         }
     }
     public Vector2 GetRandomPosition()
     {
-        float x = UnityEngine.Random.Range(-10f, 10f); 
-        float y = UnityEngine.Random.Range(-10f, 10f); 
+        float x = UnityEngine.Random.Range(-5f, 5f); 
+        float y = UnityEngine.Random.Range(-5f, 5f); 
         return new Vector2(x, y);
+    }
+
+    public void SendUser(EndUser user ,Event_Packet e)
+    {
+        user.DefferedSend(e.GetBytes());
+    }
+
+
+    public void SendAllUser(Event_Packet e)
+    {
+        foreach (var kv in NetworkManager.instance.EndUsers)
+        {
+            kv.Value.DefferedSend(e.GetBytes());
+            kv.Value.Dispatch();
+        }
+    }
+
+    public void SendAllExceptUser(Event_Packet e,EndUser uesr)
+    {
+        foreach (var kv in NetworkManager.instance.EndUsers)
+        {
+            if (kv.Value != uesr)
+            {
+                kv.Value.DefferedSend(e.GetBytes());
+                kv.Value.Dispatch();
+            }
+        }
     }
 
     void ProcEvent(Memory<byte> e , EndUser user)
@@ -49,59 +75,77 @@ public class GameManager : MonoBehaviour
         EventDefine type = (EventDefine)e.Span[0];
         switch (type)
         {
-            case EventDefine.InstantiatePrefab:
+            case EventDefine.Login:
                 {
-                    (int ID, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn, string prefabName) = Event_InstantiatePrefab.GetDecode(e);
-                    GameObject Object = Instantiate(PrefabDicts[prefabName], pos, Qtn);
-                    var Cnet = Object.AddComponent<NetComponent>();
-                    Cnet.ID = ID;
-                    Cnet.user = user;
-                    Debug.Log($"InstantiatePrefab{prefabName}");
-                    NetObjects.Add(ID, Cnet);
-                }
-                break;
-            case EventDefine.ChargeInput:
-                {
-                    (int ID, bool charge) = Event_chargeInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(ID, out var obj))
+                    // 유니티는 싱글 스레드 이기 때문에 세션을 만들기 보다는
+                    // 인스턴스용 서버를 따로 두는게 맞는 설계 인듯.
+
+                    //하나의 인스턴스라고 가정하고 Login시 새 유저가 들어 왔음으로 
+                    // 임의의 위치에 인스턴스를 생성해준다.
+
+                    Vector2 RandomPos = GetRandomPosition();
+                    Vector3 NewPos = new Vector3(RandomPos.x, 5, RandomPos.y);
+                    GameObject prefab = prefabDicts["Player"];
+                    GameObject NetObject = Instantiate(prefab, NewPos, Quaternion.identity);
+                    int NetID = NetworkManager.instance.AllocNetObjectID();
+                    var view = NetObject.GetComponent<NetViewer>();
+                    view.NetID = NetID;
+                    view.user = user;
+                    view.prefabName = "Player";
+                    NetworkManager.instance.NetObjects.Add(NetID, view);
+
+                    foreach (var kv in NetworkManager.instance.EndUsers)
                     {
-                        obj.GetComponent<NetPlayerInput>().ChargeInput(charge);
+                        var NetEvent = new Event_InstantiatePrefab(NetID, NewPos, Quaternion.identity, kv.Value == user, "Player");
+                        kv.Value.DefferedSend(NetEvent.GetBytes());
                     }
-                }
-                break;
-            case EventDefine.ThrowInput:
-                {
-                    (int id, bool Throw) = Event_ThrowInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+
+                    // 기존에 존재하는 넷오브젝트를 제공해야 한다.
+                    foreach (var kv in NetworkManager.instance.NetObjects)
                     {
-                        obj.GetComponent<NetPlayerInput>().ThrowInput(Throw);
+                        NetViewer Oldview = kv.Value;
+                        if (Oldview != view)
+                        {
+                            var InstantiateEvent = new Event_InstantiatePrefab(kv.Key, Oldview.transform.position, Oldview.transform.rotation, false, Oldview.prefabName);
+                            SendUser(user, InstantiateEvent);
+                        }
                     }
+                    Debug.Log($"SendAllUser Event_InstantiatePrefab NetID {NetID}");
                 }
                 break;
             case EventDefine.JumpInput:
                 {
                     (int id, bool jump) = Event_JumpInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+                    var JumpEvent = new Event_JumpInput(id,jump);
+                    if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                     {
-                        obj.GetComponent<NetPlayerInput>().JumpInput(jump);
+                        Player unityobj = obj.GetComponent<Player>();
+                        unityobj.GetComponent<NetPlayerInput>().JumpInput(jump);
                     }
+                    SendAllExceptUser(JumpEvent, user);
                 }
                 break;
             case EventDefine.SprintInput:
                 {
                     (int id, bool sprint) = Event_sprintInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+                    var SprintEvent = new Event_sprintInput(id, sprint);
+                    if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                     {
-                        obj.GetComponent<NetPlayerInput>().SprintInput(sprint);
+                        Player unityobj = obj.GetComponent<Player>();
+                        unityobj.GetComponent<NetPlayerInput>().SprintInput(sprint);
+                        SendAllExceptUser(SprintEvent, user);
                     }
                 }
                 break;
             case EventDefine.LookInput:
                 {
                     (int id, UnityEngine.Vector2 look) = Event_lookInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+                    var LookEvent = new Event_lookInput(id, look);
+                    if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                     {
-                        obj.GetComponent<NetPlayerInput>().LookInput(look);
+                        Player unityobj =  obj.GetComponent<Player>();
+                        unityobj.GetComponent<NetPlayerInput>().LookInput(look);
+                        SendAllExceptUser(LookEvent, user);
                     }
                 }
                 break;
@@ -109,20 +153,29 @@ public class GameManager : MonoBehaviour
             case EventDefine.MoveInput:
                 {
                     (int id, UnityEngine.Vector2 move) = Event_MoveInput.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+                    var moveEvent = new Event_lookInput(id, move);
+                    if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                     {
-                        obj.GetComponent<NetPlayerInput>().MoveInput(move);
+                        Player unityobj = obj.GetComponent<Player>();
+                        unityobj.GetComponent<NetPlayerInput>().MoveInput(move);
+                        SendAllExceptUser(moveEvent, user);
                     }
                 }
                 break;
 
-            case EventDefine.TansformSync:
+            case EventDefine.PlayerSyncTransform:
                 {
                     (int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn) = Event_TansformSync.GetDecode(e);
-                    if (NetObjects.TryGetValue(id, out var obj))
+                    var TansformSyncEvent = new Event_lookInput(id, pos);
+                    if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                     {
-                        obj.transform.position = Vector3.Lerp(obj.transform.position, pos, Mathf.Clamp01(3 * Time.deltaTime));
-                        obj.GetComponent<Player>().CinemachineCameraTarget.transform.rotation = Qtn;
+                        Player unityobj = obj.GetComponent<Player>();
+                        var controller = unityobj.GetComponent<CharacterController>();
+                        controller.enabled = false;
+                        unityobj.transform.position = Vector3.Lerp(unityobj.transform.position, pos, Mathf.Clamp01(3 * Time.deltaTime));
+                        unityobj.CinemachineCameraTarget.transform.rotation = Qtn;
+                        controller.enabled = true;
+                        SendAllExceptUser(TansformSyncEvent, user);
                     }
                 }
                 break;
@@ -131,36 +184,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if(NetworkManager.instance.NewSyncUsers.TryDequeue(out var user))
-        {
-            if (!Endusers.TryGetValue(user.RemoteEndPoint, out var _))
-            {
-                // 새로운 유저가 들어온 경우
-                Debug.Log($"New Player! {user.RemoteEndPoint} : {user.SyncID}");
-                Endusers.Add(user.RemoteEndPoint, user);
-                // 월드의 임의의 위치에 플레이어를 생성
-                Vector2 NewPos = GetRandomPosition();
-                GameObject player = Instantiate(PrefabDicts["Player"], new Vector3(NewPos.x, 5, NewPos.y), Quaternion.identity);
-                var CNET = player.AddComponent<NetComponent>();
-                Event_InstantiatePrefab e = new Event_InstantiatePrefab(NetworkManager.instance.AllocNetObjectID(), new Vector3(NewPos.x, 5, NewPos.y), Quaternion.identity, "Player");
-                CNET.ID = e.ID;
-                CNET.user = user;
-                Transform playerCameraRoot = player.transform.Find("PlayerCameraRoot");
-                var CNET2 = playerCameraRoot.AddComponent<NetComponent>();
-                CNET2.ID = NetworkManager.instance.AllocNetObjectID();
-                CNET2.user = user;
-                NetObjects.Add(CNET.ID, CNET);
-                NetObjects.Add(CNET2.ID, CNET2);
-                user.DefferedSend(e.GetBytes());
-                Debug.Log($"InstantiatePrefab{"Player"}");
-            }
-        }
-
-        foreach(var kv in Endusers)
+        foreach (var kv in NetworkManager.instance.EndUsers)
         {
             while (kv.Value.PacketCompleteQueue.TryDequeue(out var e))
             {
-                ProcEvent(e,kv.Value);
+                ProcEvent(e, kv.Value);
             }
             kv.Value.Dispatch();
         }

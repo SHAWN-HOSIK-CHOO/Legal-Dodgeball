@@ -154,9 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60870c80ed16d17428fa43357c6537ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RemoteIP: 172.17.79.105
+  RemoteIP: 192.168.0.38
   RemotePort: 8000
-  LocalIP: 172.17.79.105
+  LocalIP: 192.168.0.38
   LocalPort: 0
 --- !u!4 &515040387
 Transform:
@@ -1062,7 +1062,6 @@ MonoBehaviour:
   VirtualCamera: {fileID: 1814988640}
   MainCamera: {fileID: 1322483144}
   prefabEntries:
-  - {fileID: 7004477061072352557, guid: 26017ab0e432b5d4aa6f5016af9ff98a, type: 3}
   - {fileID: 418019869820635661, guid: 355b8b692e22d8a4bb48fc4e29885adf, type: 3}
 --- !u!4 &1694488060
 Transform:

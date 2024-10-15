@@ -4,7 +4,7 @@ namespace Attack
 {
     public class ExplodeBall : BallScriptBase
     {
-        public float explodeRadius  = 3f;
+        public float explodeRadius = 3f;
         public float explosionForce = 100f;
         protected override void ExplodeOrDestroyThisBall()
         {
@@ -16,10 +16,10 @@ namespace Attack
                 Rigidbody rb = nearbyCollider.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
-                    rb.AddExplosionForce(explosionForce,transform.position,explodeRadius);
+                    rb.AddExplosionForce(explosionForce, transform.position, explodeRadius);
                 }
             }
-            
+
             Destroy(this.gameObject);
         }
     }

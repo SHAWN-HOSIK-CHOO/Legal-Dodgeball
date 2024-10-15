@@ -17,7 +17,10 @@ public class NetworkManager : MonoBehaviour
     private Task SyncTask = null;
     private CancellationTokenSource SyncTaskTokenSource = null;
     private CancellationToken syncTaskToken;
-    public ConcurrentQueue<EndUser> NewSyncUsers = new ConcurrentQueue<EndUser>();
+
+
+    public Dictionary<IPEndPoint, EndUser> EndUsers = new Dictionary<IPEndPoint, EndUser>();
+    public Dictionary<int, NetViewer> NetObjects = new Dictionary<int, NetViewer>();
 
     static int NetObjectID = 0;
 
@@ -30,6 +33,7 @@ public class NetworkManager : MonoBehaviour
 
     private void Awake()
     {
+        //NetLibrary.DefineFlag.LogEnable = false;
         if (instance != null)
         {
             Destroy(gameObject);
@@ -43,7 +47,8 @@ public class NetworkManager : MonoBehaviour
         SyncTaskTokenSource = new CancellationTokenSource();
         syncTaskToken = SyncTaskTokenSource.Token;
         netWork = new NetLibrary.Network(new IPEndPoint(IPAddress.Parse(InternetProtocol), Port), 255);
-        NewSyncUsers.Clear();
+        EndUsers.Clear();
+        NetObjects.Clear();
         SyncTask = Task.Run(async () =>
         {
             Debug.Log("Server SyncTask Start");
@@ -52,24 +57,26 @@ public class NetworkManager : MonoBehaviour
                 var (success, user) = await netWork?.WaitSyncRequest(-1);
                 if (success)
                 {
-                    Debug.Log($"New Sync! {user.RemoteEndPoint} : {user.SyncID}");
-                    NewSyncUsers.Enqueue(user);
+                    if(!EndUsers.TryGetValue(user.RemoteEndPoint, out var _))
+                    {
+                        EndUsers.Add(user.RemoteEndPoint, user);
+                        Debug.Log($"New User! {user.RemoteEndPoint} : {user.SyncID}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Old User.. {user.RemoteEndPoint} : {user.SyncID}");
+                    }
                 }
             }
             Debug.Log("Server SyncTask End");
         });
     }
 
-    void Start()
+
+    private void Update()
     {
-
+        
     }
-
-    void Update()
-    {
-
-    }
-
 
     private void OnDisable()
     {

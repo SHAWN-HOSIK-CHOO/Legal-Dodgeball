@@ -1,16 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NormalBall : BallScriptBase
 {
     private Rigidbody _rigidbody;
-    
+
     private void Awake()
     {
-        _rigidbody             = this.GetComponent<Rigidbody>();
-        _rigidbody.useGravity  = false;
+        _rigidbody = this.GetComponent<Rigidbody>();
+        _rigidbody.useGravity = false;
         _rigidbody.isKinematic = true;
     }
 
@@ -20,8 +17,8 @@ public class NormalBall : BallScriptBase
         {
             Debug.Log("Released!");
             //this.transform.rotation = this.transform.parent.rotation;
-            this.transform.parent  = null;
-            _rigidbody.useGravity  = true;
+            this.transform.parent = null;
+            _rigidbody.useGravity = true;
             _rigidbody.isKinematic = false;
             _rigidbody.AddForce(direction * gain);
         }

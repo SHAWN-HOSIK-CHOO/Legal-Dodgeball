@@ -1,12 +1,7 @@
-using Assets.Scripts.PacketEvent;
 using Cinemachine;
 using NetLibrary;
-using StarterAssets;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM
@@ -14,6 +9,9 @@ using UnityEngine.InputSystem;
 #endif
 public class Player : MonoBehaviour
 {
+    public int NetID { get; set; }
+    public EndUser user { get; set; }
+
     [Header("Player")]
     [Tooltip("Move speed of the character in m/s")]
     public float MoveSpeed = 2.0f;
@@ -104,7 +102,6 @@ public class Player : MonoBehaviour
     private Animator _animator;
     private CharacterController _controller;
     private NetPlayerInput _Netinput;
-    private GameObject _mainCamera;
 
     private const float _threshold = 0.01f;
 
@@ -121,21 +118,21 @@ public class Player : MonoBehaviour
 #endif
         }
     }
+    public void GetPacket(byte[] packet)
+    {
 
+    }
     private void Awake()
     {
-        // get a reference to our main camera
-        if (_mainCamera == null)
-        {
-            _mainCamera = GameManager.instance.MainCamera;
-            Transform playerCameraRoot = transform.Find("PlayerCameraRoot");
-            CinemachineCameraTarget = playerCameraRoot.gameObject;
-        }
+
     }
 
     private void Start()
     {
-        GameManager.instance.VirtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = CinemachineCameraTarget.transform;
+        if(GetComponent<NetViewer>().IsMine)
+        {
+            GameManager.instance.VirtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = CinemachineCameraTarget.transform;
+        }
         _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();

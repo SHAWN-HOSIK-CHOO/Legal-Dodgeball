@@ -8,8 +8,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour 
 {
+    public int NetID { get; set; }
+    public EndUser user { get; set; }
+
     [Header("Player")]
     [Tooltip("Move speed of the character in m/s")]
     public float MoveSpeed = 2.0f;
@@ -70,7 +73,6 @@ public class Player : MonoBehaviour
     [Tooltip("For locking the camera position on all axis")]
     public bool LockCameraPosition = false;
 
-
     // player
     private float _speed;
     private float _animationBlend;
@@ -102,11 +104,14 @@ public class Player : MonoBehaviour
 
     private bool _hasAnimator;
 
+    public void GetPacket(byte[] packet)
+    {
 
+    }
     private void Awake()
     {
-        Transform playerCameraRoot = transform.Find("PlayerCameraRoot");
-        CinemachineCameraTarget = playerCameraRoot.gameObject;
+
+
     }
     private void Start()
     {
@@ -200,17 +205,17 @@ public class Player : MonoBehaviour
             _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
         }
 
-
-        //0.2초 간격으로 위치를 동기화 시킨다.
+        //0.5초 간격으로 위치를 동기화 시킨다.
         _NetTransfromSyncTimeout += Time.deltaTime;
         if (_NetTransfromSyncTimeout > _NetTransfromSyncDelay)
         {
-            var CNET = GetComponent<NetComponent>();
-            Event_TansformSync e = new Event_TansformSync(CNET.ID, transform.position, transform.rotation);
-            CNET.user.DefferedSend(e.GetBytes());
+            var CNET = GetComponent<NetViewer>();
+            Event_TansformSync e = new Event_TansformSync(CNET.NetID, transform.position, CinemachineCameraTarget.transform.rotation);
+            GameManager.instance.SendAllUser(e);
             _NetTransfromSyncTimeout = _NetTransfromSyncDelay;
         }
     }
+
 
     private void JumpAndGravity()
     {

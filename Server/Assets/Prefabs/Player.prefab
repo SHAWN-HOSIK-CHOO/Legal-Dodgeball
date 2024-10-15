@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 4033159632411483947}
   - component: {fileID: 4693317853404417843}
   - component: {fileID: 6659638054955575463}
+  - component: {fileID: 5373657676563206860}
   - component: {fileID: 3422726417994645118}
   - component: {fileID: 2265414660163068375}
   m_Layer: 8
@@ -149,6 +150,18 @@ CharacterController:
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.93, z: 0}
+--- !u!114 &5373657676563206860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418019869820635661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd63e21548e5b6946aa29019fc2791a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3422726417994645118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,7 +191,7 @@ MonoBehaviour:
   GroundLayers:
     serializedVersion: 2
     m_Bits: 1
-  CinemachineCameraTarget: {fileID: 0}
+  CinemachineCameraTarget: {fileID: 4849737902890641669}
   TopClamp: 70
   BottomClamp: -30
   CameraAngleOverride: 0

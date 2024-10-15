@@ -79,6 +79,7 @@ GameObject:
   - component: {fileID: 3280675125869234056}
   - component: {fileID: 1918932915859158305}
   - component: {fileID: 8887141035195684808}
+  - component: {fileID: 6492223908765737786}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -197,7 +198,7 @@ MonoBehaviour:
   GroundLayers:
     serializedVersion: 2
     m_Bits: 1
-  CinemachineCameraTarget: {fileID: 0}
+  CinemachineCameraTarget: {fileID: 4849737902890641669}
   TopClamp: 70
   BottomClamp: -30
   CameraAngleOverride: 0
@@ -322,6 +323,18 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &6492223908765737786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418019869820635661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3149e5cd0b444fe4c857f223ad4bd6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &481211558790373716
 GameObject:
   m_ObjectHideFlags: 0
