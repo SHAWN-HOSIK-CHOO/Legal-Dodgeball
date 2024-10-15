@@ -6,6 +6,7 @@ using Cinemachine;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
+using TMPro;
 
 public enum EPlayerState
 {
@@ -17,6 +18,9 @@ public enum EPlayerState
 
 public class ThrowBallController : MonoBehaviour
 {
+    //Debug Object
+    public TMP_Text debug;
+    
     //SetFromEditor
     [Header("Set From Editor")]
     public CinemachineVirtualCamera throwAimCamera;
@@ -65,33 +69,12 @@ public class ThrowBallController : MonoBehaviour
     {
         if (_starterAssetsInputs.charge)
         {
-            _animator.SetLayerWeight(1,1);
-            _animator.SetBool(Throw,  false);
-            _animator.SetBool(Charge, true);
-            _starterAssetsInputs.charge        = false;
-            currentPlayerState                 = EPlayerState.Charge;
-            _thirdPersonController.SprintSpeed = _thirdPersonController.MoveSpeed;
-            throwAimCamera.gameObject.SetActive(true);
+            AttackChargeAction();
         }
         
         if (_starterAssetsInputs.throwShoot)
         {
-            Vector3 mouseWorldPosition = Vector3.zero;
-            Ray     ray                = Camera.main.ScreenPointToRay(_screenCenterPoint);
-            if (Physics.Raycast(ray, out RaycastHit hit,999f, aimColliderMask))
-            {
-                mouseWorldPosition   = hit.point;
-                mouseWorldPosition.y = this.transform.position.y;
-            }
-
-            Vector3 throwDirection = ( mouseWorldPosition - this.transform.position ).normalized;
-            this.transform.forward = throwDirection;
-            
-            _animator.SetBool(Charge, false);
-            _animator.SetBool(Throw,  true);
-            currentPlayerState              = EPlayerState.Throw;
-            _starterAssetsInputs.throwShoot = false;
-            StartCoroutine(WaitAndChangePlayerState(0.3f, EPlayerState.Default));
+            AttackShootAction();
         }
 
         if (currentPlayerState == EPlayerState.Default)
@@ -100,8 +83,42 @@ public class ThrowBallController : MonoBehaviour
             _thirdPersonController.SprintSpeed = _sprintSpeedForRecovery;
             _animator.SetLayerWeight(1,0);
         }
+
+        debug.text = "Player: " + GameManager.Instance.PlayerHP + "\n" 
+                     + "Enemy: " + GameManager.Instance.EnemyHP;
     }
 
+    private void AttackChargeAction()
+    {
+        _animator.SetLayerWeight(1,1);
+        _animator.SetBool(Throw,  false);
+        _animator.SetBool(Charge, true);
+        _starterAssetsInputs.charge        = false;
+        currentPlayerState                 = EPlayerState.Charge;
+        _thirdPersonController.SprintSpeed = _thirdPersonController.MoveSpeed * 1.6f;
+        throwAimCamera.gameObject.SetActive(true);
+    }
+
+    private void AttackShootAction()
+    {
+        Vector3 mouseWorldPosition = Vector3.zero;
+        Ray     ray                = Camera.main.ScreenPointToRay(_screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit hit,999f, aimColliderMask))
+        {
+            mouseWorldPosition   = hit.point;
+            mouseWorldPosition.y = this.transform.position.y;
+        }
+
+        Vector3 throwDirection = ( mouseWorldPosition - this.transform.position ).normalized;
+        this.transform.forward = throwDirection;
+            
+        _animator.SetBool(Charge, false);
+        _animator.SetBool(Throw,  true);
+        currentPlayerState              = EPlayerState.Throw;
+        _starterAssetsInputs.throwShoot = false;
+        StartCoroutine(WaitAndChangePlayerState(0.3f, EPlayerState.Default));
+    }
+    
     IEnumerator WaitAndChangePlayerState(float seconds, EPlayerState nextState)
     {
         yield return new WaitForSeconds(seconds);
