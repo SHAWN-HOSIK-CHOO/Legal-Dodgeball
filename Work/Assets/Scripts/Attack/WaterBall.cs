@@ -1,9 +1,6 @@
 using UnityEngine;
-<<<<<<< HEAD
-=======
 using System;
 using System.Collections;
->>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
 
 namespace Attack
 {
@@ -15,12 +12,7 @@ namespace Attack
             Instantiate(onDestroyEffect, transform.position, transform.rotation);
 
             if (ColliedObjectTag == "Floor")
-<<<<<<< HEAD
-                Instantiate(pfWater, transform.position, pfWater.transform.rotation);
-            
-            Destroy(this.gameObject);
-        }
-=======
+
                 Instantiate(pfWater, transform.position - new Vector3(0f, 0.2f, 0f), pfWater.transform.rotation);
             
             Destroy(this.gameObject);
@@ -49,6 +41,5 @@ namespace Attack
             }
             ColliedObjectTag = String.Empty;
         }
->>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
     }
 }
