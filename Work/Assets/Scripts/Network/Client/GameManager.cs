@@ -50,7 +50,7 @@ namespace Client
                         (int ID, UnityEngine.Vector3 pos, UnityEngine.Quaternion qtn, bool ismine, string prefabName) = Event_InstantiatePrefab.GetDecode(e);
                         GameObject prefab = ismine ? prefabDicts["CPlayerGroup"] : prefabDicts["SPlayerGroup"];
                         GameObject NewObject = Instantiate(prefab, pos, qtn);
-                        var view = NewObject.GetComponent<NetViewer>();
+                        var view = NewObject.GetComponentInChildren<NetViewer>();
                         view.NetID = ID;
                         view.user = user;
                         view.IsMine = ismine;

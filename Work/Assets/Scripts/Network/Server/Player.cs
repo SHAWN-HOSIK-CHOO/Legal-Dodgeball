@@ -10,7 +10,6 @@ using UnityEngine.InputSystem;
 
 namespace Server
 {
-    [RequireComponent(typeof(CharacterController))]
     public class Player : Assets.Scripts.Network.Player
     {
         float _NetTransfromSyncTimeout = 0;

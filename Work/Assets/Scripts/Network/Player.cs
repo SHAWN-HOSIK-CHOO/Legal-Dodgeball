@@ -7,10 +7,6 @@ using UnityEngine;
 
 namespace Assets.Scripts.Network
 {
-    [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM
-    [RequireComponent(typeof(UnityEngine.InputSystem.PlayerInput))]
-#endif
     public class Player : MonoBehaviour
     {
         [Header("Player")]

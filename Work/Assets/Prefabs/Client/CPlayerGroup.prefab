@@ -466,10 +466,10 @@ GameObject:
   - component: {fileID: 6478746865833015176}
   - component: {fileID: 2307985526793993473}
   - component: {fileID: 3439129071429125475}
-  - component: {fileID: 5998560868714405959}
   - component: {fileID: 8173702788267518898}
   - component: {fileID: 1153416440002665915}
   - component: {fileID: 2848094722493176822}
+  - component: {fileID: 107994044397788309}
   m_Layer: 8
   m_Name: CPlayer
   m_TagString: Player
@@ -641,21 +641,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: 0
   m_Camera: {fileID: 0}
---- !u!114 &5998560868714405959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1182115486375330907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3149e5cd0b444fe4c857f223ad4bd6ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsMine: 0
-  prefabName: 
-  NetID: 0
 --- !u!114 &8173702788267518898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,6 +721,21 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   currentPlayerState: 0
+--- !u!114 &107994044397788309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182115486375330907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3149e5cd0b444fe4c857f223ad4bd6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsMine: 0
+  prefabName: 
+  NetID: 0
 --- !u!1 &1246115549936723140
 GameObject:
   m_ObjectHideFlags: 0

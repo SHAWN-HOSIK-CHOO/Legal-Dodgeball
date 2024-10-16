@@ -82,30 +82,29 @@ namespace Server
                         // 유니티는 싱글 스레드 이기 때문에 세션을 만들기 보다는
                         // 인스턴스용 서버를 따로 두는게 맞는 설계 인듯.
 
+
                         //하나의 인스턴스라고 가정하고 Login시 새 유저가 들어 왔음으로 
+                        // 기존에 존재하는 넷오브젝트를 해당 유저에게 제공해야 한다.
+                        foreach (var kv in NetworkManager.instance.NetObjects)
+                        {
+                            NetViewer NetView = kv.Value;
+                            var InstantiateEvent = new Event_InstantiatePrefab(kv.Key, NetView.transform.position, NetView.transform.rotation, user == NetView.user, NetView.prefabName);
+                            SendUser(user, InstantiateEvent);
+                        }
+
                         // 임의의 위치에 인스턴스를 생성해준다.
                         Vector2 RandomPos = GetRandomPosition();
                         Vector3 NewPos = new Vector3(RandomPos.x, 5, RandomPos.y);
                         GameObject prefab = prefabDicts["SPlayerGroup"];
                         GameObject NetObject = Instantiate(prefab, NewPos, Quaternion.identity);
+                        var view = NetObject.GetComponentInChildren<NetViewer>();
                         int NetID = NetworkManager.instance.AllocNetObjectID();
-                        var view = NetObject.GetComponent<NetViewer>();
                         view.NetID = NetID;
                         view.user = user;
                         view.IsMine = false;
                         view.prefabName = "SPlayerGroup";
                         NetworkManager.instance.NetObjects.Add(NetID, view);
 
-                        // 기존에 존재하는 넷오브젝트를 해당 유저에게 제공해야 한다.
-                        foreach (var kv in NetworkManager.instance.NetObjects)
-                        {
-                            NetViewer Oldview = kv.Value;
-                            if (Oldview != view)
-                            {
-                                var InstantiateEvent = new Event_InstantiatePrefab(kv.Key, Oldview.transform.position, Oldview.transform.rotation, false, Oldview.prefabName);
-                                SendUser(user, InstantiateEvent);
-                            }
-                        }
                         // 새로운 프리팹을 모두에게 제공한다.
                         foreach (var kv in NetworkManager.instance.EndUsers)
                         {
