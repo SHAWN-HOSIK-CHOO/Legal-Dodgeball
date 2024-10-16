@@ -86,7 +86,7 @@ public class ThrowBallController : MonoBehaviour
         if (currentPlayerState == EPlayerState.Default)
         {
             var CNET = GetComponent<NetViewer>();
-            if (CNET.IsMine)
+            if (CNET?.IsMine == true)
             {
                 throwAimCamera.gameObject.SetActive(false);
             }
@@ -108,7 +108,7 @@ public class ThrowBallController : MonoBehaviour
         _Player.SprintSpeed = _Player.MoveSpeed * 1.6f;
 
         var CNET = GetComponent<NetViewer>();
-        if (CNET.IsMine)
+        if (CNET?.IsMine == true)
         {
             throwAimCamera.gameObject.SetActive(true);
         }    

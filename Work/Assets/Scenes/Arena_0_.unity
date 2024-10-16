@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4684,6 +4683,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 4208457858665570781, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5224118882747200751, guid: 8147d11bcb6385a44b92fec580ad44e0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4698,6 +4702,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 9.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5405689243673627868, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5405689243673627868, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5405689243673627868, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5405689243673627868, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[3].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6074650768402415068, guid: 8147d11bcb6385a44b92fec580ad44e0,
         type: 3}
@@ -4738,7 +4762,7 @@ PrefabInstance:
     - target: {fileID: 7814627140003745737, guid: 8147d11bcb6385a44b92fec580ad44e0,
         type: 3}
       propertyPath: pfPossessedBallList.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7814627140003745737, guid: 8147d11bcb6385a44b92fec580ad44e0,
         type: 3}
@@ -4746,7 +4770,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8573226858726572974, guid: 9702f317a74ac68418f5dfc8c042140c,
         type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4208457858665570781, guid: 8147d11bcb6385a44b92fec580ad44e0, type: 3}
+    - {fileID: 22740529837625901, guid: 8147d11bcb6385a44b92fec580ad44e0, type: 3}
+    - {fileID: 1247662910166007586, guid: 8147d11bcb6385a44b92fec580ad44e0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5494788006497519539, guid: 8147d11bcb6385a44b92fec580ad44e0,
@@ -4762,6 +4789,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1262255846}
+    - targetCorrespondingSourceObject: {fileID: 7455878887365812665, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      insertIndex: 3
+      addedObject: {fileID: 1635158687}
+    - targetCorrespondingSourceObject: {fileID: 7455878887365812665, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1635158690}
+    - targetCorrespondingSourceObject: {fileID: 7455878887365812665, guid: 8147d11bcb6385a44b92fec580ad44e0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1635158689}
   m_SourcePrefab: {fileID: 100100000, guid: 8147d11bcb6385a44b92fec580ad44e0, type: 3}
 --- !u!1001 &713982555
 PrefabInstance:
@@ -9488,6 +9527,83 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6053771845067770069, guid: 1aa40f61b9dff8243a113cb21796b3fc, type: 3}
+--- !u!1 &1635158676 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7455878887365812665, guid: 8147d11bcb6385a44b92fec580ad44e0,
+    type: 3}
+  m_PrefabInstance: {fileID: 713283483}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1635158687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635158676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 707127b23d0871049842aa3ad89c03a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move: {x: 0, y: 0}
+  look: {x: 0, y: 0}
+  jump: 0
+  sprint: 0
+  charge: 0
+  throwShoot: 0
+  analogMovement: 0
+  cursorLocked: 1
+  cursorInputForLook: 1
+  IsNetInput: 0
+--- !u!114 &1635158689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635158676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3149e5cd0b444fe4c857f223ad4bd6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsMine: 0
+  prefabName: 
+  NetID: 0
+--- !u!114 &1635158690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635158676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5725a052b2f36dd4ba8164893e545080, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 2
+  SprintSpeed: 5.335
+  RotationSmoothTime: 0.12
+  SpeedChangeRate: 10
+  LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
+  FootstepAudioClips: []
+  FootstepAudioVolume: 0.5
+  JumpHeight: 1.2
+  Gravity: -15
+  JumpTimeout: 0.5
+  FallTimeout: 0.15
+  Grounded: 1
+  GroundedOffset: -0.14
+  GroundedRadius: 0.28
+  GroundLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  CinemachineCameraTarget: {fileID: 114064862}
+  TopClamp: 70
+  BottomClamp: -30
+  CameraAngleOverride: 0
+  LockCameraPosition: 0
 --- !u!1001 &1650256873
 PrefabInstance:
   m_ObjectHideFlags: 0

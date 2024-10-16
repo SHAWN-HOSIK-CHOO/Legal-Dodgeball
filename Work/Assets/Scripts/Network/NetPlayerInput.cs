@@ -76,9 +76,7 @@ using UnityEngine.InputSystem;
             {
                 var CNET = GetComponent<NetViewer>();
                 Event_TansformSync SYNC = new Event_TansformSync(CNET.NetID, transform.position, GetComponent<Assets.Scripts.Network.Player>().CinemachineCameraTarget.transform.rotation);
-                //Event_lookInput Look = new Event_lookInput(CNET.ID, newLookDirection);
                 CNET.user?.DefferedSend(SYNC.GetBytes());
-                //CNET.user.DefferedSend(Look.GetBytes());
             }
             look = newLookDirection;
         }
