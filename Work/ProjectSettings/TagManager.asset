@@ -3,20 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - CinemachineTarget
-  - Environment
-  - Wall
-  - Floor
-<<<<<<< HEAD
-=======
-  - Enemy
->>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Wall
+  - 
   - Water
   - UI
   - 
