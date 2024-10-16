@@ -7,6 +7,8 @@ using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
 using TMPro;
+using Client;
+using Server;
 
 public enum EPlayerState
 {
@@ -38,8 +40,8 @@ public class ThrowBallController : MonoBehaviour
     [SerializeField] private LayerMask                aimColliderMask  = new LayerMask();
 
     //Other Scripts from this gameObject
-    private StarterAssetsInputs   _starterAssetsInputs;
-    private ThirdPersonController _thirdPersonController;
+    private NetPlayerInput _NetPlayerInput;
+    private Assets.Scripts.Network.Player _Player;
     private float                 _sprintSpeedForRecovery;
     
     private GameObject       _throwableBall;
@@ -54,33 +56,41 @@ public class ThrowBallController : MonoBehaviour
         _animator            = this.GetComponent<Animator>();
         _animator.SetLayerWeight(1,0);
         _screenCenterPoint      = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        _starterAssetsInputs    = GetComponent<StarterAssetsInputs>();
-        _thirdPersonController  = GetComponent<ThirdPersonController>();
-        _sprintSpeedForRecovery = _thirdPersonController.SprintSpeed;
+        _NetPlayerInput = GetComponent<NetPlayerInput>();
+        _Player  = GetComponent<Assets.Scripts.Network.Player>();
+        _sprintSpeedForRecovery = _Player.SprintSpeed;
         currentPlayerState      = EPlayerState.Default;
     }
 
     private void Start()
     {
-        throwAimCamera.gameObject.SetActive(false);
+        var CNET = GetComponent<NetViewer>();
+        if (CNET.IsMine)
+        {
+            throwAimCamera.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (_starterAssetsInputs.charge)
+        if (_NetPlayerInput.charge)
         {
             AttackChargeAction();
         }
         
-        if (_starterAssetsInputs.throwShoot)
+        if (_NetPlayerInput.throwShoot)
         {
             AttackShootAction();
         }
 
         if (currentPlayerState == EPlayerState.Default)
         {
-            throwAimCamera.gameObject.SetActive(false);
-            _thirdPersonController.SprintSpeed = _sprintSpeedForRecovery;
+            var CNET = GetComponent<NetViewer>();
+            if (CNET.IsMine)
+            {
+                throwAimCamera.gameObject.SetActive(false);
+            }
+            _Player.SprintSpeed = _sprintSpeedForRecovery;
             _animator.SetLayerWeight(1,0);
         }
 
@@ -93,10 +103,16 @@ public class ThrowBallController : MonoBehaviour
         _animator.SetLayerWeight(1,1);
         _animator.SetBool(Throw,  false);
         _animator.SetBool(Charge, true);
-        _starterAssetsInputs.charge        = false;
+        _NetPlayerInput.charge        = false;
         currentPlayerState                 = EPlayerState.Charge;
-        _thirdPersonController.SprintSpeed = _thirdPersonController.MoveSpeed * 1.6f;
-        throwAimCamera.gameObject.SetActive(true);
+        _Player.SprintSpeed = _Player.MoveSpeed * 1.6f;
+
+        var CNET = GetComponent<NetViewer>();
+        if (CNET.IsMine)
+        {
+            throwAimCamera.gameObject.SetActive(true);
+        }    
+
     }
 
     private void AttackShootAction()
@@ -115,7 +131,7 @@ public class ThrowBallController : MonoBehaviour
         _animator.SetBool(Charge, false);
         _animator.SetBool(Throw,  true);
         currentPlayerState              = EPlayerState.Throw;
-        _starterAssetsInputs.throwShoot = false;
+        _NetPlayerInput.throwShoot = false;
         StartCoroutine(WaitAndChangePlayerState(0.3f, EPlayerState.Default));
     }
     

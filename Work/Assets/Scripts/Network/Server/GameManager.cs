@@ -84,25 +84,19 @@ namespace Server
 
                         //하나의 인스턴스라고 가정하고 Login시 새 유저가 들어 왔음으로 
                         // 임의의 위치에 인스턴스를 생성해준다.
-
                         Vector2 RandomPos = GetRandomPosition();
                         Vector3 NewPos = new Vector3(RandomPos.x, 5, RandomPos.y);
-                        GameObject prefab = prefabDicts["Player"];
+                        GameObject prefab = prefabDicts["SPlayerGroup"];
                         GameObject NetObject = Instantiate(prefab, NewPos, Quaternion.identity);
                         int NetID = NetworkManager.instance.AllocNetObjectID();
                         var view = NetObject.GetComponent<NetViewer>();
                         view.NetID = NetID;
                         view.user = user;
-                        view.prefabName = "Player";
+                        view.IsMine = false;
+                        view.prefabName = "SPlayerGroup";
                         NetworkManager.instance.NetObjects.Add(NetID, view);
 
-                        foreach (var kv in NetworkManager.instance.EndUsers)
-                        {
-                            var NetEvent = new Event_InstantiatePrefab(NetID, NewPos, Quaternion.identity, kv.Value == user, "Player");
-                            kv.Value.DefferedSend(NetEvent.GetBytes());
-                        }
-
-                        // 기존에 존재하는 넷오브젝트를 제공해야 한다.
+                        // 기존에 존재하는 넷오브젝트를 해당 유저에게 제공해야 한다.
                         foreach (var kv in NetworkManager.instance.NetObjects)
                         {
                             NetViewer Oldview = kv.Value;
@@ -111,6 +105,20 @@ namespace Server
                                 var InstantiateEvent = new Event_InstantiatePrefab(kv.Key, Oldview.transform.position, Oldview.transform.rotation, false, Oldview.prefabName);
                                 SendUser(user, InstantiateEvent);
                             }
+                        }
+                        // 새로운 프리팹을 모두에게 제공한다.
+                        foreach (var kv in NetworkManager.instance.EndUsers)
+                        {
+                            Event_InstantiatePrefab NetEvent;
+                            if (kv.Value != user)
+                            {
+                                NetEvent = new Event_InstantiatePrefab(NetID, NewPos, Quaternion.identity, false, "SPlayerGroup");
+                            }
+                            else
+                            {
+                                NetEvent = new Event_InstantiatePrefab(NetID, NewPos, Quaternion.identity, true, "CPlayerGroup");
+                            }
+                            kv.Value.DefferedSend(NetEvent.GetBytes());
                         }
                         Debug.Log($"SendAllUser Event_InstantiatePrefab NetID {NetID}");
                     }

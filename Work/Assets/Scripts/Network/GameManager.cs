@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -20,8 +21,7 @@ public class GameManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
-    //Player Status
+        //Player Status
     [Header("Player Status")] 
     public float PlayerHP = 60f;
     public float PlayerMaxHP = 100f;

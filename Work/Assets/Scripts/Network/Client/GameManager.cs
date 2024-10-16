@@ -7,7 +7,6 @@ namespace Client
 {
     public class GameManager : MonoBehaviour
     {
-        public GameObject VirtualCamera;
         public GameObject MainCamera;
 
         public static GameManager instance { get; private set; } = null;
@@ -49,7 +48,7 @@ namespace Client
                 case EventDefine.InstantiatePrefab:
                     {
                         (int ID, UnityEngine.Vector3 pos, UnityEngine.Quaternion qtn, bool ismine, string prefabName) = Event_InstantiatePrefab.GetDecode(e);
-                        GameObject prefab = prefabDicts["Player"];
+                        GameObject prefab = ismine ? prefabDicts["CPlayerGroup"] : prefabDicts["SPlayerGroup"];
                         GameObject NewObject = Instantiate(prefab, pos, qtn);
                         var view = NewObject.GetComponent<NetViewer>();
                         view.NetID = ID;

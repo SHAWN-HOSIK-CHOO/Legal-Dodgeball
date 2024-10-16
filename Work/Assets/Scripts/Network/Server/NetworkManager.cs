@@ -44,8 +44,8 @@ namespace Server
             else
             {
                 instance = this;
+                DontDestroyOnLoad(this);
             }
-            DontDestroyOnLoad(this);
             SyncTaskTokenSource = new CancellationTokenSource();
             syncTaskToken = SyncTaskTokenSource.Token;
             netWork = new NetLibrary.Network(new IPEndPoint(IPAddress.Parse(InternetProtocol), Port), 255);
