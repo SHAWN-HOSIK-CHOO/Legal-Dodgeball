@@ -441,7 +441,7 @@ namespace Assets.Scripts.PacketEvent
         public string Prefab;
         public int ID;
         public bool IsMine;
-        public Event_InstantiatePrefab(int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn, string prefabName , bool IsMine)
+        public Event_InstantiatePrefab(int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn, bool IsMine, string prefabName)
             : base(EventDefine.InstantiatePrefab)
         {
             ID = id;
