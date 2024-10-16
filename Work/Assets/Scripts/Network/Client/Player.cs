@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Client
 {
     public class Player : Assets.Scripts.Network.Player
-    { 
+    {
         private bool IsCurrentDeviceMouse
         {
             get

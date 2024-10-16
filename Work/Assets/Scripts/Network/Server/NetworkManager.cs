@@ -35,7 +35,7 @@ namespace Server
 
         private void Awake()
         {
-            //NetLibrary.DefineFlag.LogEnable = false;
+            NetLibrary.DefineFlag.LogEnable = false;
             if (instance != null)
             {
                 Destroy(gameObject);

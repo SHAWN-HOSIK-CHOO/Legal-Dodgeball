@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d6c1cf28e397f47a96af44caec4eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsServer: 1
   prefabLists:
   - {fileID: 8970449321882246519, guid: f582cf57f2ec88742914ef703c1d7e90, type: 3}
   - {fileID: 3782112690909770051, guid: 5e6635f9feb96784da2ad90f151ca0ae, type: 3}
@@ -183,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3a82a3825fd03e4a8754482c130b7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InternetProtocol: 192.168.28.163
+  InternetProtocol: 172.17.79.105
   Port: 8000
 --- !u!114 &264226414
 MonoBehaviour:
@@ -194,10 +195,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 264226410}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 397dcdb45a060ee4281bb2ec9e1b5c25, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a4534207567a584391a9947354a6197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerHP: 100
+  PlayerHP: 60
   PlayerMaxHP: 100
   PlayerCurrentBallCount: 1
   EnemyHP: 100
@@ -535,10 +536,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21cbc97d7101b54995f080148f0cbd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainCamera: {fileID: 1488686772}
-  prefabEntries:
-  - {fileID: 8970449321882246519, guid: f582cf57f2ec88742914ef703c1d7e90, type: 3}
+  IsServer: 0
+  prefabLists:
   - {fileID: 3782112690909770051, guid: 5e6635f9feb96784da2ad90f151ca0ae, type: 3}
+  - {fileID: 8970449321882246519, guid: f582cf57f2ec88742914ef703c1d7e90, type: 3}
+  MainCamera: {fileID: 1488686772}
 --- !u!114 &800294214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -551,10 +553,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 077e38a44b8fc9046a8a0be25748b6f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RemoteIP: 192.168.28.163
+  RemoteIP: 172.17.79.105
   RemotePort: 8000
-  LocalIP: 192.168.28.163
-  LocalPort: 0
+  LocalIP: 172.17.79.105
+  LocalPort: 9000
 --- !u!114 &800294215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,10 +566,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 800294211}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 397dcdb45a060ee4281bb2ec9e1b5c25, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a4534207567a584391a9947354a6197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerHP: 100
+  PlayerHP: 60
   PlayerMaxHP: 100
   PlayerCurrentBallCount: 1
   EnemyHP: 100

@@ -14,8 +14,6 @@ namespace Server
     {
         float _NetTransfromSyncTimeout = 0;
         float _NetTransfromSyncDelay = 0.2f;
-
-
         public void GetPacket(byte[] packet)
         {
 
@@ -117,14 +115,17 @@ namespace Server
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
 
-            //0.5초 간격으로 위치를 동기화 시킨다.
-            _NetTransfromSyncTimeout += Time.deltaTime;
-            if (_NetTransfromSyncTimeout > _NetTransfromSyncDelay)
+            if (GameManager.instance.IsServer)
             {
-                var CNET = GetComponent<NetViewer>();
-                Event_TansformSync e = new Event_TansformSync(CNET.NetID, transform.position, CinemachineCameraTarget.transform.rotation);
-                GameManager.instance.SendAllUser(e);
-                _NetTransfromSyncTimeout = _NetTransfromSyncDelay;
+                var GM = GameManager.instance as Server.GameManager;
+                _NetTransfromSyncTimeout += Time.deltaTime;
+                if (_NetTransfromSyncTimeout > _NetTransfromSyncDelay)
+                {
+                    var CNET = GetComponent<NetViewer>();
+                    Event_TansformSync e = new Event_TansformSync(CNET.NetID, transform.position, CinemachineCameraTarget.transform.rotation);
+                    GM.SendAllUser(e);
+                    _NetTransfromSyncTimeout = _NetTransfromSyncDelay;
+                }
             }
         }
 

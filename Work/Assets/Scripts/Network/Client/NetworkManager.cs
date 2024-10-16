@@ -49,6 +49,8 @@ namespace Client
             {
                 Debug.Log($"New Sync{user.SyncID}");
                 EndUser = user;
+                NetLibrary.DefineFlag.LogEnable = false;
+
 
                 var e = new Event_Login();
                 EndUser.DefferedSend(e.GetBytes());

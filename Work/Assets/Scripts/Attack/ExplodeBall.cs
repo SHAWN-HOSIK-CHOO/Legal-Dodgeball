@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using Assets.Scripts.Network;
 
 namespace Attack
 {
@@ -12,25 +13,23 @@ namespace Attack
         {
             Instantiate(onDestroyEffect, transform.position, transform.rotation);
 
-            Collider[] colliders = Physics.OverlapSphere(this.transform.position, explodeRadius);
-            foreach (Collider nearbyCollider in colliders)
+            if(GameManager.instance.IsServer)
             {
-                Rigidbody rb = nearbyCollider.GetComponent<Rigidbody>();
-                if (rb != null)
+                Collider[] colliders = Physics.OverlapSphere(this.transform.position, explodeRadius);
+                foreach (Collider nearbyCollider in colliders)
                 {
-                    rb.AddExplosionForce(explosionForce,transform.position,explodeRadius);
-                }
+                    Rigidbody rb = nearbyCollider.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.AddExplosionForce(explosionForce, transform.position, explodeRadius);
+                    }
 
-                if (nearbyCollider.gameObject.CompareTag("Enemy"))
-                {
-                    GameManager.Instance.MinusEnemyHP(20f);
-                }
-                else if (nearbyCollider.gameObject.CompareTag("Player"))
-                {
-                    GameManager.Instance.MinusPlayerHP(20f);
+                    if (nearbyCollider.gameObject.CompareTag("Player"))
+                    {
+                        GManager.Instance.MinusPlayerHP(nearbyCollider.gameObject,20f);
+                    }
                 }
             }
-            
             Destroy(this.gameObject);
         }
         
@@ -41,18 +40,11 @@ namespace Attack
                 ColliedObjectTag = other.gameObject.tag;
                 StartCoroutine(Timer());
             }
-            else if (other.gameObject.CompareTag("Enemy"))
-            {
-                ColliedObjectTag = other.gameObject.tag;
-                Debug.Log("Enemy hit!");
-                GameManager.Instance.MinusEnemyHP(50f);
-                ExplodeOrDestroyThisBall();
-            }
             else if (other.gameObject.CompareTag("Player"))
             {
                 ColliedObjectTag = other.gameObject.tag;
                 Debug.Log("Player hit!");
-                GameManager.Instance.MinusPlayerHP(50f);
+                GManager.Instance.MinusPlayerHP(other.gameObject,50f);
                 ExplodeOrDestroyThisBall();
             }
             ColliedObjectTag = String.Empty;

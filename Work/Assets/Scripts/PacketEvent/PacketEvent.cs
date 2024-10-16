@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.PacketEvent
 {
@@ -20,6 +22,9 @@ namespace Assets.Scripts.PacketEvent
     public enum EventDefine : byte
     {
         Login,
+        ChangeTurn,
+        SetHp,
+        SetPlayer,
         InstantiatePrefab,
 
 
@@ -54,6 +59,139 @@ namespace Assets.Scripts.PacketEvent
             return bytes;
         }
     }
+    public class Event_SetPlayer : Event_Packet
+    {
+        public EventDefine Event;
+        int player1ID; 
+        int player2ID;
+
+
+        public Event_SetPlayer(int player1ID, int player2ID)
+            : base(EventDefine.SetPlayer)
+        {
+            this.player1ID = player1ID;
+            this.player2ID = player2ID;
+        }
+
+        public static (int p1ID, int p2ID) GetDecode(Memory<byte> bytes)
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+            int offset = 0;
+            EventDefine eventDefine = (EventDefine)bytes.Span[offset];
+            offset += ProtocolSize;
+
+            int p1ID = BitConverter.ToInt32(bytes.Slice(offset, NetID_Length).Span);
+            offset += NetID_Length;
+
+            int p2ID = BitConverter.ToInt32(bytes.Slice(offset, NetID_Length).Span);
+            offset += NetID_Length;
+
+            return (p1ID, p2ID);
+        }
+        public override byte[] GetBytes()
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+
+            int offset = 0;
+            byte[] bytes = new byte[ProtocolSize + NetID_Length+ NetID_Length];
+            bytes[offset] = (byte)EventDefine.SetPlayer;
+            offset += ProtocolSize;
+            BitConverter.GetBytes(player1ID).CopyTo(bytes.AsMemory(offset, NetID_Length));
+            offset += NetID_Length;
+            BitConverter.GetBytes(player2ID).CopyTo(bytes.AsMemory(offset, NetID_Length));
+            offset += NetID_Length;
+            return bytes;
+        }
+    }
+
+
+    public class Event_SetHp : Event_Packet
+    {
+        public EventDefine Event;
+        int NetID;
+        float HP;
+
+        public Event_SetHp(int id, float hp)
+            : base(EventDefine.SetHp)
+        {
+            HP = hp;
+            NetID = id;
+        }
+
+        public static (int id, float hp) GetDecode(Memory<byte> bytes)
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+            int HP_Length = 4;
+            int offset = 0;
+            EventDefine eventDefine = (EventDefine)bytes.Span[offset];
+            offset += ProtocolSize;
+
+            int id = BitConverter.ToInt32(bytes.Slice(offset, NetID_Length).Span);
+            offset += NetID_Length;
+            float hp = BitConverter.ToSingle(bytes.Slice(offset, NetID_Length).Span);
+            offset += HP_Length;
+            return (id,hp);
+        }
+        public override byte[] GetBytes()
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+            int HP_Length = 4;
+
+            int offset = 0;
+            byte[] bytes = new byte[ProtocolSize + NetID_Length+ HP_Length];
+            bytes[offset] = (byte)EventDefine.SetHp;
+            offset += ProtocolSize;
+            BitConverter.GetBytes(NetID).CopyTo(bytes.AsMemory(offset, NetID_Length));
+            offset += NetID_Length;
+            BitConverter.GetBytes(HP).CopyTo(bytes.AsMemory(offset, NetID_Length));
+            offset += NetID_Length;
+            return bytes;
+        }
+    }
+    public class Event_ChangeTurn : Event_Packet
+    {
+        public EventDefine Event;
+        int TurnObjectNetID;
+
+        public Event_ChangeTurn(int id)
+            : base(EventDefine.ChangeTurn)
+        {
+            TurnObjectNetID  = id;
+        }
+
+        public static int GetDecode(Memory<byte> bytes)
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+
+            int offset = 0;
+            EventDefine eventDefine = (EventDefine)bytes.Span[offset];
+            offset += ProtocolSize;
+
+            int id = BitConverter.ToInt32(bytes.Slice(offset, NetID_Length).Span);
+            offset += NetID_Length;
+
+            return id;
+        }
+        public override byte[] GetBytes()
+        {
+            int ProtocolSize = 1;
+            int NetID_Length = 4;
+
+            int offset = 0;
+            byte[] bytes = new byte[ProtocolSize+ NetID_Length];
+            bytes[offset] = (byte)EventDefine.ChangeTurn;
+            offset += ProtocolSize;
+            BitConverter.GetBytes(TurnObjectNetID).CopyTo(bytes.AsMemory(offset, NetID_Length));
+            offset += NetID_Length;
+            return bytes;
+        }
+    }
+
     public class Event_TansformSync : Event_Packet
     {
         public EventDefine Event;

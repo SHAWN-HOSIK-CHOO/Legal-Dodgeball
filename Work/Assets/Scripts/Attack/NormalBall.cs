@@ -19,21 +19,11 @@ namespace Attack
                 ColliedObjectTag = other.gameObject.tag;
                 StartCoroutine(Timer());
             }
-            else if (other.gameObject.CompareTag("Enemy"))
-            {
-                ColliedObjectTag = other.gameObject.tag;
-                Debug.Log("Enemy hit!");
-                GameManager.Instance.MinusEnemyHP(10f);
-                GameManager.Instance.PlusPlayerHP(10f);
-                
-                ExplodeOrDestroyThisBall();
-            }
             else if (other.gameObject.CompareTag("Player"))
             {
                 ColliedObjectTag = other.gameObject.tag;
                 Debug.Log("Player hit!");
-                GameManager.Instance.PlusEnemyHP(10f);
-                GameManager.Instance.MinusPlayerHP(10f);
+                GManager.Instance.MinusPlayerHP(other.gameObject,10f);
                 
                 ExplodeOrDestroyThisBall();
             }

@@ -9,6 +9,7 @@ using UnityEngine.Serialization;
 using TMPro;
 using Client;
 using Server;
+using Assets.Scripts.PacketEvent;
 
 public enum EPlayerState
 {
@@ -22,44 +23,44 @@ public class ThrowBallController : MonoBehaviour
 {
     //Debug Object
     public TMP_Text debug;
-    
+
     //SetFromEditor
     [Header("Set From Editor")]
     public CinemachineVirtualCamera throwAimCamera;
-    public Transform        ballPlacePosition;
+    public Transform ballPlacePosition;
     public List<GameObject> pfPossessedBallList = new List<GameObject>();
-    public int              ballIndex = 0;
-    public float            gain              = 100f;
-    
-    private                 Animator   _animator;
-    private static readonly int        Charge = Animator.StringToHash("Charge");
-    private static readonly int        Throw  = Animator.StringToHash("Throw");
+    public int ballIndex = 0;
+    public float gain = 100f;
 
-    private                  Vector2                  _screenCenterPoint;
-    private                  Vector3                  _targetDirection = Vector3.zero;
-    [SerializeField] private LayerMask                aimColliderMask  = new LayerMask();
+    private Animator _animator;
+    private static readonly int Charge = Animator.StringToHash("Charge");
+    private static readonly int Throw = Animator.StringToHash("Throw");
+
+    private Vector2 _screenCenterPoint;
+    private Vector3 _targetDirection = Vector3.zero;
+    [SerializeField] private LayerMask aimColliderMask = new LayerMask();
 
     //Other Scripts from this gameObject
     private NetPlayerInput _NetPlayerInput;
     private Assets.Scripts.Network.Player _Player;
-    private float                 _sprintSpeedForRecovery;
-    
-    private GameObject       _throwableBall;
-    
+    private float _sprintSpeedForRecovery;
+
+    private GameObject _throwableBall;
+
     //Player State
     [Space(5)]
     [Header("Do not change")]
     public EPlayerState currentPlayerState;
-    
+
     private void Awake()
     {
-        _animator            = this.GetComponent<Animator>();
-        _animator.SetLayerWeight(1,0);
-        _screenCenterPoint      = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        _animator = this.GetComponent<Animator>();
+        _animator.SetLayerWeight(1, 0);
+        _screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         _NetPlayerInput = GetComponent<NetPlayerInput>();
-        _Player  = GetComponent<Assets.Scripts.Network.Player>();
+        _Player = GetComponent<Assets.Scripts.Network.Player>();
         _sprintSpeedForRecovery = _Player.SprintSpeed;
-        currentPlayerState      = EPlayerState.Default;
+        currentPlayerState = EPlayerState.Default;
     }
 
     private void Start()
@@ -77,11 +78,6 @@ public class ThrowBallController : MonoBehaviour
         {
             AttackChargeAction();
         }
-        
-        if (_NetPlayerInput.throwShoot)
-        {
-            AttackShootAction();
-        }
 
         if (currentPlayerState == EPlayerState.Default)
         {
@@ -91,50 +87,53 @@ public class ThrowBallController : MonoBehaviour
                 throwAimCamera.gameObject.SetActive(false);
             }
             _Player.SprintSpeed = _sprintSpeedForRecovery;
-            _animator.SetLayerWeight(1,0);
+            _animator.SetLayerWeight(1, 0);
         }
 
-        debug.text = "Player: " + GameManager.Instance.PlayerHP + "\n" 
-                     + "Enemy: " + GameManager.Instance.EnemyHP;
+        if (GetComponent<NetViewer>().IsMine)
+        {
+            debug.text = "Player: " + GManager.Instance.PlayerHP + "\n"
+                         + "Enemy: " + GManager.Instance.Player2HP;
+        }
     }
 
     private void AttackChargeAction()
     {
-        _animator.SetLayerWeight(1,1);
-        _animator.SetBool(Throw,  false);
+        _animator.SetLayerWeight(1, 1);
+        _animator.SetBool(Throw, false);
         _animator.SetBool(Charge, true);
-        _NetPlayerInput.charge        = false;
-        currentPlayerState                 = EPlayerState.Charge;
+        _NetPlayerInput.charge = false;
+        currentPlayerState = EPlayerState.Charge;
         _Player.SprintSpeed = _Player.MoveSpeed * 1.6f;
 
         var CNET = GetComponent<NetViewer>();
         if (CNET?.IsMine == true)
         {
             throwAimCamera.gameObject.SetActive(true);
-        }    
+        }
 
     }
 
-    private void AttackShootAction()
+    public void AttackShootAction()
     {
         Vector3 mouseWorldPosition = Vector3.zero;
-        Ray     ray                = Camera.main.ScreenPointToRay(_screenCenterPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit,999f, aimColliderMask))
+        Ray ray = Camera.main.ScreenPointToRay(_screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimColliderMask))
         {
-            mouseWorldPosition   = hit.point;
+            mouseWorldPosition = hit.point;
             mouseWorldPosition.y = this.transform.position.y;
         }
 
-        Vector3 throwDirection = ( mouseWorldPosition - this.transform.position ).normalized;
+        Vector3 throwDirection = (mouseWorldPosition - this.transform.position).normalized;
         this.transform.forward = throwDirection;
-            
+
         _animator.SetBool(Charge, false);
-        _animator.SetBool(Throw,  true);
-        currentPlayerState              = EPlayerState.Throw;
+        _animator.SetBool(Throw, true);
+        currentPlayerState = EPlayerState.Throw;
         _NetPlayerInput.throwShoot = false;
         StartCoroutine(WaitAndChangePlayerState(0.3f, EPlayerState.Default));
     }
-    
+
     IEnumerator WaitAndChangePlayerState(float seconds, EPlayerState nextState)
     {
         yield return new WaitForSeconds(seconds);
@@ -163,11 +162,11 @@ public class ThrowBallController : MonoBehaviour
         else
         {
             Ray ray = Camera.main.ScreenPointToRay(_screenCenterPoint);
-            if (Physics.Raycast(ray, out RaycastHit hit,999f, aimColliderMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimColliderMask))
             {
                 _targetDirection = (hit.point - _throwableBall.transform.position).normalized;
             }
-            
+
             _throwableBall.GetComponent<BallScriptBase>().ReleaseMe(_targetDirection, gain);
             _animator.SetBool(Throw, false);
         }
@@ -177,6 +176,6 @@ public class ThrowBallController : MonoBehaviour
     {
         GameObject ball = Instantiate(pfPossessedBallList[ballIndex], ballPlacePosition);
         ball.transform.localPosition = Vector3.zero;
-        _throwableBall               = ball;
+        _throwableBall = ball;
     }
 }

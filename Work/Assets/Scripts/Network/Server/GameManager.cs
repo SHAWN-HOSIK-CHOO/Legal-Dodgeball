@@ -3,22 +3,17 @@ using NetLibrary;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UIVirtualButton;
 
 namespace Server
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : Assets.Scripts.Network.GameManager
     {
-        public List<GameObject> prefabLists = new List<GameObject>();
-        private Dictionary<string, GameObject> prefabDicts = new Dictionary<string, GameObject>();
-
-        public static GameManager instance { get; private set; } = null;
-
         private void Awake()
         {
             if (instance != null)
@@ -75,13 +70,14 @@ namespace Server
         void ProcEvent(Memory<byte> e, EndUser user)
         {
             EventDefine type = (EventDefine)e.Span[0];
+            DefineFlag.LogEnable = false;
             switch (type)
             {
                 case EventDefine.Login:
                     {
+                        Debug.Log("Receive Login");
                         // 유니티는 싱글 스레드 이기 때문에 세션을 만들기 보다는
                         // 인스턴스용 서버를 따로 두는게 맞는 설계 인듯.
-
 
                         //하나의 인스턴스라고 가정하고 Login시 새 유저가 들어 왔음으로 
                         // 기존에 존재하는 넷오브젝트를 해당 유저에게 제공해야 한다.
@@ -120,6 +116,25 @@ namespace Server
                             kv.Value.DefferedSend(NetEvent.GetBytes());
                         }
                         Debug.Log($"SendAllUser Event_InstantiatePrefab NetID {NetID}");
+
+
+                        if (GManager.Instance.Players[0] == null)
+                        {
+                            GManager.Instance.Players[0] = view.gameObject;
+                            Debug.Log($"SET PLAYER 1  NetID {view.NetID}");
+
+                        }
+                        else if (GManager.Instance.Players[1] == null)
+                        {
+                            GManager.Instance.Players[1] = view.gameObject;
+                            Debug.Log($"SET PLAYER 2  NetID {view.NetID}");
+                        }
+
+                        // 플레이어를 세팅한다.
+                        if (GManager.Instance.Players[0] == null || GManager.Instance.Players[1] == null) return;
+                        var SetPlayer_Event = new Event_SetPlayer(GManager.Instance.Players[0].GetComponent<NetViewer>().NetID,
+                            GManager.Instance.Players[1].GetComponent<NetViewer>().NetID);
+                        SendAllUser(SetPlayer_Event);
                     }
                     break;
                 case EventDefine.JumpInput:
@@ -158,11 +173,52 @@ namespace Server
                         }
                     }
                     break;
+                case EventDefine.ChargeInput:
+                    {
+                        (int id, bool charge) = Event_chargeInput.GetDecode(e);
+                        var ChargeEvent = new Event_chargeInput(id, charge);
+                        if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
+                        {
+                            Player unityobj = obj.GetComponent<Player>();
+                            unityobj.GetComponent<NetPlayerInput>().ChargeInput(charge);
+                            SendAllExceptUser(ChargeEvent, user);
+                        }
+                    }
+                    break;
+                case EventDefine.ThrowInput:
+                    {
+                        (int id, bool Throw) = Event_ThrowInput.GetDecode(e);
+                        var ThrowEvent = new Event_ThrowInput(id, Throw);
+                        if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
+                        {
+                            Debug.Log($"Someone try to Throw");
 
+
+                            if (GManager.Instance.TurnPlayer != obj.gameObject) return;
+
+                            if (obj.gameObject == GManager.Instance.Players[0])
+                            {
+                                Debug.Log($"Player1 Turn!");
+                            }
+                            else if (obj.gameObject == GManager.Instance.Players[1])
+                            {
+                                Debug.Log($"Player2 Turn!");
+                            }
+
+                            Player unityobj = obj.GetComponent<Player>();
+                            unityobj.GetComponent<NetPlayerInput>().ThrowInput(Throw);
+                            unityobj.GetComponent<ThrowBallController>().AttackShootAction();
+                            SendAllUser(ThrowEvent);
+
+
+                            GManager.Instance.ChangeTurn();
+                        }
+                    }
+                    break;
                 case EventDefine.MoveInput:
                     {
                         (int id, UnityEngine.Vector2 move) = Event_MoveInput.GetDecode(e);
-                        var moveEvent = new Event_lookInput(id, move);
+                        var moveEvent = new Event_MoveInput(id, move);
                         if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                         {
                             Player unityobj = obj.GetComponent<Player>();
@@ -175,7 +231,7 @@ namespace Server
                 case EventDefine.PlayerSyncTransform:
                     {
                         (int id, UnityEngine.Vector3 pos, UnityEngine.Quaternion Qtn) = Event_TansformSync.GetDecode(e);
-                        var TansformSyncEvent = new Event_lookInput(id, pos);
+                        var TansformSyncEvent = new Event_TansformSync(id, pos , Qtn);
                         if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                         {
                             Player unityobj = obj.GetComponent<Player>();
@@ -201,6 +257,10 @@ namespace Server
                 }
                 kv.Value.Dispatch();
             }
+
+            //턴 번호를 말해준다.
+
+
         }
     }
 }
