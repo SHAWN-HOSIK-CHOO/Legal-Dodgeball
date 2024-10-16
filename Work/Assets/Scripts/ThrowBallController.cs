@@ -69,20 +69,23 @@ public class ThrowBallController : MonoBehaviour
     {
         if (_starterAssetsInputs.charge)
         {
-            AttackChargeAction();
+            if(GameManager.Instance.playerETurn == ETurn.Attack)
+                AttackChargeAction();
         }
         
         if (_starterAssetsInputs.throwShoot)
         {
-            AttackShootAction();
+            if(GameManager.Instance.playerETurn == ETurn.Attack)
+                AttackShootAction();
         }
 
-        if (currentPlayerState == EPlayerState.Default)
-        {
-            throwAimCamera.gameObject.SetActive(false);
-            _thirdPersonController.SprintSpeed = _sprintSpeedForRecovery;
-            _animator.SetLayerWeight(1,0);
-        }
+        if(GameManager.Instance.playerETurn == ETurn.Attack)
+            if (currentPlayerState == EPlayerState.Default)
+            {
+                throwAimCamera.gameObject.SetActive(false);
+                _thirdPersonController.SprintSpeed = _sprintSpeedForRecovery;
+                _animator.SetLayerWeight(1,0);
+            }
 
         debug.text = "Player: " + GameManager.Instance.PlayerHP + "\n" 
                      + "Enemy: " + GameManager.Instance.EnemyHP;
@@ -125,19 +128,7 @@ public class ThrowBallController : MonoBehaviour
         currentPlayerState = nextState;
     }
 
-    public void SetBallIndex(int index)
-    {
-        if (index >= pfPossessedBallList.Count)
-        {
-            Debug.Log("Index overflow, automatically set to 0");
-            ballIndex = 0;
-        }
-        else
-        {
-            ballIndex = index;
-        }
-    }
-
+    //Called from Unity Animation System , (Animation Clip : Charge)
     public void ThrowBall()
     {
         if (_throwableBall == null)
@@ -157,9 +148,10 @@ public class ThrowBallController : MonoBehaviour
         }
     }
 
+    //Called from Unity Animation System , (Animation Clip : Throw)
     public void InstantiateBall()
     {
-        GameObject ball = Instantiate(pfPossessedBallList[ballIndex], ballPlacePosition);
+        GameObject ball = Instantiate(pfPossessedBallList[GameManager.Instance.PlayerBallIndex], ballPlacePosition);
         ball.transform.localPosition = Vector3.zero;
         _throwableBall               = ball;
     }

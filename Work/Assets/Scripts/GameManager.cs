@@ -2,6 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.Users;
+using UnityEngine.Serialization;
+
+public enum ETurn
+{
+    Attack,
+    Defense,
+    Count
+}
 
 public class GameManager : MonoBehaviour
 {
@@ -24,8 +33,10 @@ public class GameManager : MonoBehaviour
     //Player Status
     [Header("Player Status")] 
     public float PlayerHP = 60f;
-    public float PlayerMaxHP = 100f;
+    public float PlayerMaxHP            = 100f;
     public int   PlayerCurrentBallCount = 1;
+    public int   PlayerBallIndex        = 0;
+    public int   PlayerDefenseIndex     = 0;
 
     //Enemy Status
     [Space(5)]
@@ -37,9 +48,8 @@ public class GameManager : MonoBehaviour
     //Level Status
 
     //Game Status
-    [Space(5)] 
-    [Header("Game Status")] 
-    public bool isPlayerTurn = true;
+    [FormerlySerializedAs("playerTurn")] [Space(5)] [Header("Game Status")] 
+    public ETurn  playerETurn  = ETurn.Attack;
     public int   RoundCount  = 1;
     public float TimePerGame = 180f;
     
@@ -95,5 +105,49 @@ public class GameManager : MonoBehaviour
     //Level
     
     //Game
-    
+
+
+    private void Update()
+    {
+        //Change Index
+        if (Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            if (playerETurn == ETurn.Attack)
+            {
+                PlayerBallIndex = 0;
+            }
+            else if (playerETurn == ETurn.Defense)
+            {
+                PlayerDefenseIndex = 0;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            if (playerETurn == ETurn.Attack)
+            {
+                PlayerBallIndex = 1;
+            }
+            else if (playerETurn == ETurn.Defense)
+            {
+                PlayerDefenseIndex = 1;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad3))
+        {
+            if (playerETurn == ETurn.Attack)
+            {
+                PlayerBallIndex = 2;
+            }
+            else if (playerETurn == ETurn.Defense)
+            {
+                PlayerDefenseIndex = 2;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            playerETurn = ETurn.Defense;
+            Debug.Log("Defense");
+        }
+    }
 }
