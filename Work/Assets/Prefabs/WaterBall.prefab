@@ -31,7 +31,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+=======
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+>>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -64,7 +68,15 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+<<<<<<< HEAD
   - {fileID: 2100000, guid: db03e4a9baa74b54491fd6309adbdbf4, type: 2}
+=======
+<<<<<<<< HEAD:Server/Assets/Prefabs/ExplosionBall.prefab
+  - {fileID: 2100000, guid: 7685b36fcde80614a943ed03343a06d0, type: 2}
+========
+  - {fileID: 2100000, guid: db03e4a9baa74b54491fd6309adbdbf4, type: 2}
+>>>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061:Work/Assets/Prefabs/WaterBall.prefab
+>>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

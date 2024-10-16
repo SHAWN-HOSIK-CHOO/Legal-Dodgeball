@@ -13,7 +13,11 @@ namespace Attack
             _rigidbody             = this.GetComponent<Rigidbody>();
             _rigidbody.useGravity  = false;
             _rigidbody.isKinematic = true;
+<<<<<<< HEAD
             ColliedObjectTag = String.Empty;
+=======
+            ColliedObjectTag       = String.Empty;
+>>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
         }
 
         public void ReleaseMe(Vector3 direction, float gain)
@@ -28,6 +32,7 @@ namespace Attack
         }
 
         protected abstract void ExplodeOrDestroyThisBall();
+<<<<<<< HEAD
     
         private void OnCollisionEnter(Collision other)
         {
@@ -38,5 +43,8 @@ namespace Attack
             }
             ColliedObjectTag = String.Empty;
         }
+=======
+        
+>>>>>>> f3a07decf6d03d5c11693cbf73ce96f052c2a061
     }
 }
