@@ -48,6 +48,7 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.Log($"New Sync{user.SyncID}");
             EndUser = user;
+
             var e = new Event_Login();
             EndUser.DefferedSend(e.GetBytes());
         }
