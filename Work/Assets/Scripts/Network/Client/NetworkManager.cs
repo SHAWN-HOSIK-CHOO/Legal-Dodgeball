@@ -39,7 +39,7 @@ namespace Client
             NetLibrary.Network client = new NetLibrary.Network(LoaclAddress, 255);
             bool Success = client.CreateEndUser(ServerAddress, SessionType.RUDP, out var user);
 
-            bool MightBeSuccess = await user.SyncEndUser(1000);
+            bool MightBeSuccess = await user.SyncEndUser(3000);
             if (!MightBeSuccess)
             {
                 Debug.Log("ΩÃ≈© Ω«∆–");
@@ -50,8 +50,6 @@ namespace Client
                 Debug.Log($"New Sync{user.SyncID}");
                 EndUser = user;
                 NetLibrary.DefineFlag.LogEnable = false;
-
-
                 var e = new Event_Login();
                 EndUser.DefferedSend(e.GetBytes());
             }

@@ -161,7 +161,7 @@ namespace Client
                 case EventDefine.ThrowInput:
                     {
                         (int id, bool Throw) = Event_chargeInput.GetDecode(e);
-                        if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
+                        if (Throw && NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                         {
                             Assets.Scripts.Network.Player unityobj = obj.GetComponent<Assets.Scripts.Network.Player>();
                             if (obj.gameObject == GManager.Instance.Players[0])

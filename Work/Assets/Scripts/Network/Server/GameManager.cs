@@ -132,6 +132,8 @@ namespace Server
 
                         // 플레이어를 세팅한다.
                         if (GManager.Instance.Players[0] == null || GManager.Instance.Players[1] == null) return;
+                        GManager.Instance.TurnPlayer = GManager.Instance.Players[0];
+
                         var SetPlayer_Event = new Event_SetPlayer(GManager.Instance.Players[0].GetComponent<NetViewer>().NetID,
                             GManager.Instance.Players[1].GetComponent<NetViewer>().NetID);
                         SendAllUser(SetPlayer_Event);
@@ -189,7 +191,7 @@ namespace Server
                     {
                         (int id, bool Throw) = Event_ThrowInput.GetDecode(e);
                         var ThrowEvent = new Event_ThrowInput(id, Throw);
-                        if (NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
+                        if (Throw && NetworkManager.instance.NetObjects.TryGetValue(id, out var obj))
                         {
                             Debug.Log($"Someone try to Throw");
 
@@ -205,12 +207,10 @@ namespace Server
                                 Debug.Log($"Player2 Turn!");
                             }
 
-                            Player unityobj = obj.GetComponent<Player>();
+                            Assets.Scripts.Network.Player unityobj = obj.GetComponent<Assets.Scripts.Network.Player>();
                             unityobj.GetComponent<NetPlayerInput>().ThrowInput(Throw);
                             unityobj.GetComponent<ThrowBallController>().AttackShootAction();
                             SendAllUser(ThrowEvent);
-
-
                             GManager.Instance.ChangeTurn();
                         }
                     }

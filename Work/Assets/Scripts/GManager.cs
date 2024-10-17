@@ -93,42 +93,41 @@ public class GManager : MonoBehaviour
 
     public void MinusPlayerHP(GameObject obj,float minus)
     {
-        if (PlayerHP - minus <= 0f)
-        {
-            PlayerHP = 0f;
-        }
-        else
-        {
-            PlayerHP -= minus;
-        }
-
+       
         if (Assets.Scripts.Network.GameManager.instance.IsServer)
         {
             var GM = Assets.Scripts.Network.GameManager.instance as Server.GameManager;
-            var HP_Event = new Event_SetHp(GetComponent<NetViewer>().NetID,PlayerHP);
-            GM.SendAllUser(HP_Event);
+
+            if (obj == GManager.Instance.Players[0])
+            {
+                Debug.Log($"Minus Player1 HP!");
+
+                if (PlayerHP - minus <= 0f)
+                {
+                    PlayerHP = 0f;
+                }
+                else
+                {
+                    PlayerHP -= minus;
+                }
+                var HP_Event = new Event_SetHp(obj.GetComponent<NetViewer>().NetID, PlayerHP);
+                GM.SendAllUser(HP_Event);
+            }
+            else if (obj == GManager.Instance.Players[1])
+            {
+                Debug.Log($"Minus Player2 HP!");
+                if (Player2HP - minus <= 0f)
+                {
+                    Player2HP = 0f;
+                }
+                else
+                {
+                    Player2HP -= minus;
+                }
+                var HP_Event = new Event_SetHp(obj.GetComponent<NetViewer>().NetID, Player2HP);
+                GM.SendAllUser(HP_Event);
+            }
         }
     }
 
-    public void PlusPlayerHP(float plus)
-    {
-        if (PlayerHP + plus >= PlayerMaxHP)
-        {
-            PlayerHP = PlayerMaxHP;
-        }
-        else
-        {
-            PlayerHP += plus;
-        }
-    }
-
-    public void Update()
-    {
-        
-
-
-
-
-
-    }
 }
